@@ -13,7 +13,7 @@ interface QuotesDao {
     @get:Query("SELECT * FROM quote")
     val all: List<Quote>
 
-    @Query("SELECT * FROM quote WHERE quote LIKE :quote AND " + "base LIKE :base LIMIT 1")
+    @Query("SELECT * FROM quote WHERE quote LIKE :quote AND " + "base LIKE :base ORDER BY timestamp DESC LIMIT 1")
     fun find(base: String, quote: String): Flowable<Quote>
 
     @Insert

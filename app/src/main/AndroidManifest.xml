@@ -32,6 +32,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".services.QuotesService"/>
+
     </application>
 
 </manifest>

@@ -10,6 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import com.exness.pushtest.db.AppDatabase
 import android.arch.persistence.room.Room
+import com.exness.pushtest.db.DbProvider
 import com.exness.pushtest.models.Quote
 import java.util.*
 
@@ -23,13 +24,14 @@ class QuotesService : IntentService(QuotesService::class.java.simpleName) {
     private lateinit var wifilock: WifiManager.WifiLock
     private lateinit var wl: PowerManager.WakeLock
 
-    private lateinit var db: AppDatabase
 
     private val quote = "USD"
     private val base = "EUR"
 
 
     override fun onCreate() {
+        super.onCreate()
+
         val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         wifilock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "LockTag")
         wifilock.acquire()
@@ -46,9 +48,6 @@ class QuotesService : IntentService(QuotesService::class.java.simpleName) {
                 .build()
 
         restService = retrofit.create(RestQuotesService::class.java)
-
-        db = Room.databaseBuilder(applicationContext,
-                AppDatabase::class.java, "db").build()
     }
 
     override fun onDestroy() {
@@ -68,7 +67,7 @@ class QuotesService : IntentService(QuotesService::class.java.simpleName) {
                 val value:Float= quotesResponse.rates[quote]!!
                 val timestamp = Date().time
                 val entity = Quote(timestamp,base,quote,value, timestamp)
-                db.quotesDao().insertAll(entity)
+                DbProvider.getInstance(this).insertAll(entity)
             }
         }
     }
