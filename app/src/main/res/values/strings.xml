@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PushTest</string>
+    <string name="waiting_for_quotes">Waiting for quotes...</string>
+</resources>

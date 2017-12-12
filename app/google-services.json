@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1081523027547",
+    "firebase_url": "https://pushtestproject-7f507.firebaseio.com",
+    "project_id": "pushtestproject-7f507",
+    "storage_bucket": "pushtestproject-7f507.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081523027547:android:d09042f185116ae4",
+        "android_client_info": {
+          "package_name": "com.exness.pushtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081523027547-go7i4k62ug4fichll6t9ms3qktg3gudh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB11kSSdC8A59-7HgF8AvRSGcyJIgYlUdc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
