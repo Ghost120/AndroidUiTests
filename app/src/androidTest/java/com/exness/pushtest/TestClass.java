@@ -1,6 +1,6 @@
 package com.exness.pushtest;
 
-import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -9,10 +9,8 @@ import android.support.test.runner.AndroidJUnit4;
 import com.exness.pushtest.activities.MainActivity;
 import com.exness.pushtest.db.DbProvider;
 import com.exness.pushtest.models.Quote;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.iid.FirebaseInstanceId;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,13 +25,17 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-
+import static com.exness.pushtest.Helper.checkThatInsertRowInDB;
+import static com.exness.pushtest.Helper.getQuote;
+import static com.exness.pushtest.Helper.getSizeDB;
+import static com.exness.pushtest.Helper.sendPushNotificationAndWaitResponse;
 
 
 /**
@@ -41,13 +43,12 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  */
 @RunWith(AndroidJUnit4.class)
 public class TestClass {
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
-
     @Test
-    public void testStartApplication(){
-
+    public void testFirstStartApplication(){
         onView(withId(R.id.text))
                 .perform(click())
                 .check(matches(isDisplayed()));
@@ -56,44 +57,18 @@ public class TestClass {
 
     @Test
     public void testAddNewQuote() {
-        clearPreferences();
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        DbProvider.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext()).insertAll(new Quote(timestamp.getTime(), "USD","eur", 1.1203F, timestamp.getTime()));
-        List <Quote> listQuote = DbProvider.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext()).getAll();
-        System.out.println();
-
-
+        int sizeDBbefore = getSizeDB();
+        sendPushNotificationAndWaitResponse(9000);
+        checkThatInsertRowInDB(9000, sizeDBbefore);
     }
 
-
-
-    private void sendPushNotification(){
-        Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl("https://us-central1-pushtestproject-7f507.cloudfunctions.net")
-                .addConverterFactory(JacksonConverterFactory.create())
-                .build();
-        Notifications listingService = restAdapter.create(Notifications.class);
-//        listingService.getReplies();
-
-        Call<Void> dataCall = listingService.getReplies();
-        dataCall.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                System.out.println("cool");
-//                Response{protocol=h2, code=200, message=, url=https://us-central1-pushtestproject-7f507.cloudfunctions.net/sendPush}
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                System.out.println("not cool");
-            }
-        });
-
+    @Test
+    public void testRotateScreen() {
+        mActivityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        mActivityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        System.out.println("");
     }
 
-
-
-    @Before
     public void clearPreferences() {
         try {
             // clearing app data
