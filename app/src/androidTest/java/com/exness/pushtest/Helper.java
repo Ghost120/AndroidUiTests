@@ -22,12 +22,16 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 
 public class Helper {
-    private static boolean isPushSuccess;
-    private static String quote = "USD";
-    private static String base = "EUR";
-    private static float rate;
+    private static final String URL_PUSH_NOTIFICATION = "https://us-central1-pushtestproject-7f507.cloudfunctions.net";
+    private static final String URL_QUOTE = "https://api.fixer.io";
+    private static final String QUOTE = "USD";
+    private static final String BASE = "EUR";
+    private static final Long sleepTime = 500L;
 
-    public static void sendPushNotificationAndWaitResponse(long delay){
+    private static boolean isPushSuccess;
+    private static Float rate;
+
+    public static void sendPushNotificationAndWaitResponse(long delay) {
         isPushSuccess = false;
         sendPushNotification();
         long time = System.currentTimeMillis();
@@ -35,7 +39,7 @@ public class Helper {
             try {
                 if (isPushSuccess)
                     break;
-                Thread.sleep(500);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -43,9 +47,9 @@ public class Helper {
         Assert.assertTrue("Push", isPushSuccess);
     }
 
-    private static void sendPushNotification(){
+    private static void sendPushNotification() {
         Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl("https://us-central1-pushtestproject-7f507.cloudfunctions.net")
+                .baseUrl(URL_PUSH_NOTIFICATION)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         Notifications listingService = restAdapter.create(Notifications.class);
@@ -63,14 +67,30 @@ public class Helper {
         });
     }
 
-    public static void getQuote (){
+
+    public static float getCurrentQuote(long delay) {
+        getQuote();
+        long time = System.currentTimeMillis();
+        while (System.currentTimeMillis() - time < delay) {
+            try {
+                if (rate != null)
+                    break;
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Assert.assertNotNull("not received a response within a certain time" + delay, rate);
+        return rate;
+    }
+
+    private static void getQuote() {
         Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl("https://api.fixer.io")
+                .baseUrl(URL_QUOTE)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         RestQuotesService restQuotesService = restAdapter.create(RestQuotesService.class);
-        Call<QuotesResponse> call = restQuotesService.quotes(base, quote);
-
+        Call<QuotesResponse> call = restQuotesService.quotes(BASE, QUOTE);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -93,7 +113,7 @@ public class Helper {
                 isAddRow = getSizeDB() > sizeBefore;
                 if (isAddRow)
                     break;
-                Thread.sleep(500);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -105,7 +125,7 @@ public class Helper {
         return getListQuoteFromDB().size();
     }
 
-    public static List<Quote> getListQuoteFromDB(){
+    public static List<Quote> getListQuoteFromDB() {
         return DbProvider.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext()).getAll();
     }
 }
