@@ -1,6 +1,7 @@
 package com.exness.pushtest;
 
 import android.support.test.InstrumentationRegistry;
+import android.util.Log;
 
 import com.exness.pushtest.db.DbProvider;
 import com.exness.pushtest.models.Quote;
@@ -8,7 +9,6 @@ import com.exness.pushtest.models.QuotesResponse;
 import com.exness.pushtest.services.RestQuotesService;
 
 import org.junit.Assert;
-
 import java.util.List;
 
 import retrofit2.Call;
@@ -41,10 +41,10 @@ public class Helper {
                     break;
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e("UI Test", e.getMessage());
             }
         }
-        Assert.assertTrue("Push", isPushSuccess);
+        Assert.assertTrue("Not received a response within a certain time", isPushSuccess);
     }
 
     private static void sendPushNotification() {
@@ -67,7 +67,6 @@ public class Helper {
         });
     }
 
-
     public static float getCurrentQuote(long delay) {
         getQuote();
         long time = System.currentTimeMillis();
@@ -77,10 +76,10 @@ public class Helper {
                     break;
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e("UI Test", e.getMessage());
             }
         }
-        Assert.assertNotNull("not received a response within a certain time" + delay, rate);
+        Assert.assertNotNull("Not received a response within a certain time" + delay, rate);
         return rate;
     }
 
