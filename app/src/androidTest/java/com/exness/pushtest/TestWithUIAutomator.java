@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 
 import ru.tinkoff.allure.annotations.DisplayName;
 
+import static com.exness.pushtest.Helper.DELAY;
+import static com.exness.pushtest.Helper.checkLastCurrencyWithReal;
 import static com.exness.pushtest.Helper.checkThatInsertRowInDB;
 import static com.exness.pushtest.Helper.getSizeDB;
 import static com.exness.pushtest.Helper.sendPushNotificationAndWaitResponse;
@@ -35,11 +37,10 @@ public class TestWithUIAutomator {
     private UiDevice mDevice;
     private static final int LAUNCH_TIMEOUT = 5000;
     private static final String BASIC_SAMPLE_PACKAGE = "com.exness.pushtest";
-    private static final long DELAY = 12000L;
 
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class,true,true);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, true);
 
     @Before
     public void startMainActivityFromHomeScreen() {
@@ -60,13 +61,19 @@ public class TestWithUIAutomator {
 
     @Test
     @DisplayName("Check that work push notification")
-    public void testWorkPushNotificationWhenAppIsNotActive(){
+    public void testWorkPushNotificationWhenAppIsNotActive() {
         mDevice.pressBack();
         sendPushNotificationAndWaitResponse(DELAY);
         launchApplication();
         checkThatInsertRowInDB(DELAY, getSizeDB());
     }
 
+    @Test
+    @DisplayName("Check that currency is displayed correctly when the application is not active")
+    public void currencyIsDisplayedCorrectlyWhenTheApplicationIsNotActive() {
+        testWorkPushNotificationWhenAppIsNotActive();
+        checkLastCurrencyWithReal();
+    }
 
     private void launchApplication() {
         Context context = InstrumentationRegistry.getContext();
